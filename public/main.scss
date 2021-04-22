@@ -1,0 +1,123 @@
+#app {
+  .nav-tabs {
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hide-xs {
+      margin-right: 3px;
+      @media screen and (max-width: 480px){
+        display: none;
+      }
+    }
+  }
+
+  //@import "./icons";
+
+
+  .ap {
+    .ap--employee-detail {
+      @media screen and (max-width: 768px) {
+        display: none;
+      }
+    }
+    &--employee-selected {
+      .ap--employee-totals {
+        @media screen and (max-width: 768px) {
+          display: none;
+        }
+      }
+      .ap--employee-detail {
+        @media screen and (max-width: 768px) {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .employee-period-totals {
+    display: flex;
+    flex-direction: column;
+    //flex-wrap: nowrap;
+    justify-content: flex-start;
+    .input-group-text {
+      width: 3rem;
+    }
+    @media screen and (min-width: 768px) {
+      flex-direction: row;
+      .period-total {
+        flex: 0 0 20%;
+        min-width: 8rem;
+      }
+    }
+
+  }
+
+  .tc__action--date-time {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    &.tc__action--clock-out {
+      flex-direction: row-reverse;
+    }
+    @media screen and (max-width:1199.98px) {
+      flex-direction: column !important;
+    }
+    .tc__action--date {
+      font-size: small;
+    }
+    .tc__action--time {
+      font-weight: bold;
+      white-space: nowrap;
+    }
+  }
+  .tc__action--type {
+    @media screen and (max-width: 480px) {
+      text-overflow: ellipsis;
+      max-width: 4rem;
+      display: block;
+      overflow: hidden;
+      font-size: small;
+    }
+  }
+
+  .period-total {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    padding: 0 0.25rem;
+    .form-control {
+      text-align: center;
+    }
+    .form-label {
+      font-weight: bold;
+      white-space: nowrap;
+      margin-right: 0.5rem;
+      flex: 0 0 25%;
+      margin-bottom: 0;
+    }
+    @media screen and (min-width: 480px){
+      flex-direction: column;
+      flex: 1 1 calc(20% - 0.25rem);
+      .form-label {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
+  .table {
+    @media screen and (max-width: 425px){
+      .hide-xs {
+        display: none;
+      }
+    }
+  }
+
+  .form-control .react-datetime-picker__wrapper {
+    border-width: 0;
+  }
+  
+}

@@ -1,0 +1,110 @@
+#app .nav-tabs .nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#app .nav-tabs .hide-xs {
+  margin-right: 3px;
+}
+@media screen and (max-width: 480px) {
+  #app .nav-tabs .hide-xs {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  #app .ap .ap--employee-detail {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  #app .ap--employee-selected .ap--employee-totals {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  #app .ap--employee-selected .ap--employee-detail {
+    display: block;
+  }
+}
+#app .employee-period-totals {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+#app .employee-period-totals .input-group-text {
+  width: 3rem;
+}
+@media screen and (min-width: 768px) {
+  #app .employee-period-totals {
+    flex-direction: row;
+  }
+  #app .employee-period-totals .period-total {
+    flex: 0 0 20%;
+    min-width: 8rem;
+  }
+}
+#app .tc__action--date-time {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+#app .tc__action--date-time.tc__action--clock-out {
+  flex-direction: row-reverse;
+}
+@media screen and (max-width: 1199.98px) {
+  #app .tc__action--date-time {
+    flex-direction: column !important;
+  }
+}
+#app .tc__action--date-time .tc__action--date {
+  font-size: small;
+}
+#app .tc__action--date-time .tc__action--time {
+  font-weight: bold;
+  white-space: nowrap;
+}
+@media screen and (max-width: 480px) {
+  #app .tc__action--type {
+    text-overflow: ellipsis;
+    max-width: 4rem;
+    display: block;
+    overflow: hidden;
+    font-size: small;
+  }
+}
+#app .period-total {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  padding: 0 0.25rem;
+}
+#app .period-total .form-control {
+  text-align: center;
+}
+#app .period-total .form-label {
+  font-weight: bold;
+  white-space: nowrap;
+  margin-right: 0.5rem;
+  flex: 0 0 25%;
+  margin-bottom: 0;
+}
+@media screen and (min-width: 480px) {
+  #app .period-total {
+    flex-direction: column;
+    flex: 1 1 calc(20% - 0.25rem);
+  }
+  #app .period-total .form-label {
+    width: 100%;
+    text-align: center;
+  }
+}
+@media screen and (max-width: 425px) {
+  #app .table .hide-xs {
+    display: none;
+  }
+}
+#app .form-control .react-datetime-picker__wrapper {
+  border-width: 0;
+}
+
+/*# sourceMappingURL=main.css.map */
