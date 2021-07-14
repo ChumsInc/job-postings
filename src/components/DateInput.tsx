@@ -1,5 +1,6 @@
-import React, {memo, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
 
 declare type DateInputType = 'date'|'datetime-local'|'time';
 
@@ -13,15 +14,16 @@ const dateValue = (date:string|number|Date|null, type: DateInputType = 'date'):s
     if (!date || !new Date(date).getTime()) {
         return '';
     }
+    let d = new Date(typeof date === 'string' ? parseISO(date) : date);
 
     switch (type) {
     case 'time':
-        return format(new Date(date), 'HH:mm');
+        return format(d, 'HH:mm');
     case 'datetime-local':
-        return format(new Date(date), "yyyy-MM-dd'T'HH:mm");
+        return format(d, "yyyy-MM-dd'T'HH:mm");
     case 'date':
     default:
-        return format(new Date(date), 'yyyy-MM-dd');
+        return format(d, 'yyyy-MM-dd');
     }
 }
 

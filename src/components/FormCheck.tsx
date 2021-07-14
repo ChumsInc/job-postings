@@ -2,7 +2,7 @@ import React, {memo} from "react";
 import classNames from "classnames";
 
 interface FormCheckProps {
-    type: 'checkbox'|'radio',
+    type?: 'checkbox'|'radio',
     checked: boolean,
     inline?: boolean,
     label?: string,
@@ -10,7 +10,7 @@ interface FormCheckProps {
     onChange: (checked:boolean) => any,
 }
 
-const FormCheck:React.FC<FormCheckProps> = ({type = 'radio', checked= false, inline = false, label = false, onChange, children}) => {
+const FormCheck:React.FC<FormCheckProps> = ({type = 'checkbox', checked= false, inline = false, label = false, onChange, children}) => {
     const changeHandler = (ev:React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.checked);
     return (
         <div className={classNames('form-check', {'form-check-inline': inline})}>

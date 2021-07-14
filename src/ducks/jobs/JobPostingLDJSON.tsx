@@ -1,5 +1,6 @@
 import React from "react";
 import {JobPosting} from "./index";
+import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
 
 interface JobPostingLDJSONProps {
     selected: JobPosting
@@ -45,13 +46,14 @@ const jobLocation = (jobLocation:string):JobLocation => {
 const JobPostingLDJSON: React.FC<JobPostingLDJSONProps> = ({selected}) => {
     const location = jobLocation(selected.jobLocation);
     return (
-        <div vocab="https://schema.org" typeof="JobPostingRender">
-            <meta property="specialCommitments" content="VeteranCommit" />
-            <h2 property="title">{selected.title}</h2>
-            <div>
-                <p>
-                    <strong>Location:</strong>
-                    <span property="jobLocation" typeof="Place">
+        <ErrorBoundary>
+            <div vocab="https://schema.org" typeof="JobPostingRender">
+                <meta property="specialCommitments" content="VeteranCommit" />
+                <h2 property="title">{selected.title}</h2>
+                <div>
+                    <p>
+                        <strong>Location:</strong>
+                        <span property="jobLocation" typeof="Place">
                         <span property="address" typeof="PostalAddress">
                             <span property="streetAddress">{location.streetAddress}</span>
                             <span property="addressLocality">{location.addressLocality}</span>
@@ -59,9 +61,11 @@ const JobPostingLDJSON: React.FC<JobPostingLDJSONProps> = ({selected}) => {
                             <span property="postalCode">{location.postalCode}</span>
                         </span>
                     </span>
-                </p>
+                    </p>
+                </div>
             </div>
-        </div>
+        </ErrorBoundary>
+
     )
 }
 export default JobPostingLDJSON;

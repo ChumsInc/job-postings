@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {defaultJobPosting, selectJobPostings, selectOnlyActive, selectSelectedJobPosting,} from "./index";
-import {filterActiveOnlyAction, fetchJobPosting, fetchJobPostings} from './actions';
+import {defaultJobPosting, selectJobPostings, selectOnlyActive} from "./index";
+import {filterActiveOnlyAction, fetchJobPostingsAction, jobPostingSelectedAction} from './actions';
 import FormCheck from "../../components/FormCheck";
 import JobPostingRow from "./JobPostingRow";
+import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
 
 const JobPostingsList:React.FC = () => {
     const dispatch = useDispatch();
@@ -11,9 +12,11 @@ const JobPostingsList:React.FC = () => {
     const onlyActive = useSelector(selectOnlyActive);
 
     const setActive = (active:boolean) => dispatch(filterActiveOnlyAction(active))
-    const onNewPosting = () => dispatch(fetchJobPosting(defaultJobPosting));
+    const onReload = () => dispatch(fetchJobPostingsAction());
+    const onClickNew = () => dispatch(jobPostingSelectedAction(defaultJobPosting))
+
     useEffect(() => {
-        dispatch(fetchJobPostings());
+        dispatch(fetchJobPostingsAction());
     }, [])
 
     return (
@@ -29,26 +32,33 @@ const JobPostingsList:React.FC = () => {
                     </div>
                 </div>
                 <div className="col-auto">
-                    <button type="button" className="btn btn-primary btn-sm" onClick={onNewPosting}>New Posting</button>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={onReload}>Reload</button>
+                </div>
+                <div className="col-auto">
+                    <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClickNew}>New</button>
                 </div>
             </div>
-            <table className="table table-hover table-sm">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <td>Posted</td>
-                </tr>
-                </thead>
-                <tbody>
-                {list.map(posting => <JobPostingRow key={posting.id} posting={posting} /> )}
-                </tbody>
-                <tfoot>
-                <tr>
-                    <th>Postings:</th>
-                    <td>{list.length}</td>
-                </tr>
-                </tfoot>
-            </table>
+            <ErrorBoundary>
+                <table className="table table-hover table-sm">
+                    <thead>
+                    <tr>
+                        <th>1/0</th>
+                        <th>Title</th>
+                        <td>Date Posted</td>
+                        <td>End Date</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {list.map(posting => <JobPostingRow key={posting.id} posting={posting} /> )}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colSpan={3}>Postings:</th>
+                        <td>{list.length}</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </ErrorBoundary>
         </div>
     )
 }

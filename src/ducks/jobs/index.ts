@@ -11,20 +11,41 @@ export const fetchJobsFailed = 'app/jobs/fetch-failed';
 export const fetchSelectedRequested = 'app/jobs/fetch-selected-requested';
 export const fetchSelectedSucceeded = 'app/jobs/fetch-selected-succeeded';
 export const fetchSelectedFailed = 'app/jobs/fetch-selected-failed';
+
 export const jobSelected = 'app/jobs/selected';
 export const jobUpdated = 'app/jobs/updated';
+
 export const saveJobRequested = 'app/jobs/save-requested';
 export const saveJobSucceeded = 'app/jobs/save-succeeded';
 export const saveJobFailed = 'app/jobs/save-failed';
+
+export const deleteJobRequested = 'app/jobs/delete-requested';
+export const deleteJobSucceeded = 'app/jobs/delete-succeeded';
+export const deleteJobFailed = 'app/jobs/delete-failed';
+
+export const saveJobPDFRequested = 'app/jobs/save-pdf-requested';
+export const saveJobPDFSucceeded = 'app/jobs/save-pdf-succeeded';
+export const saveJobPDFFailed = 'app/jobs/save-pdf-failed';
+
 export const setActiveFilter = 'app/jobs/filter-active';
 
+
 export const fetchJobsURL = (id?: number) => `/api/timeclock-admin/job-postings/${encodeURIComponent(String(id || ''))}`;
+export const postJobPostingPDFURL = (id: number) => fetchJobsURL(id) + '/upload-pdf';
 
-export declare type ValidEmploymentType = 'FULL_TIME'|'PART_TIME'|'CONTRACTOR'|'TEMPORARY'|'INTERN'|'VOLUNTEER'|'PER_DIEM'|'OTHER';
+export declare type ValidEmploymentType =
+    'FULL_TIME'
+    | 'PART_TIME'
+    | 'CONTRACTOR'
+    | 'TEMPORARY'
+    | 'INTERN'
+    | 'VOLUNTEER'
+    | 'PER_DIEM'
+    | 'OTHER';
 
-export type EmploymentTypeMap = {[employmentType in ValidEmploymentType]: string}
+export type EmploymentTypeMap = { [employmentType in ValidEmploymentType]: string }
 
-export const EmploymentTypes:EmploymentTypeMap = {
+export const EmploymentTypes: EmploymentTypeMap = {
     FULL_TIME: 'Full Time',
     PART_TIME: 'Part Time',
     CONTRACTOR: 'Contractor',
@@ -45,6 +66,7 @@ export interface BaseSalary {
 export interface JobPosting {
     id: number,
     title: string,
+    enabled: boolean,
     description: string,
     datePosted: string | null,
     jobLocation: string,
@@ -55,6 +77,8 @@ export interface JobPosting {
     experienceRequirements: number
     experienceInPlaceOfEducation: boolean,
     filename: string,
+    emailRecipient?: string,
+    applicationInstructions?: string,
     timestamp: string,
     changed?: boolean,
 }
@@ -65,6 +89,7 @@ export interface JobPostingsAction extends Action {
         jobPosting?: JobPosting,
         props?: PropType,
         onlyActive?: boolean,
+        progress?: number,
     }
 }
 
@@ -82,6 +107,7 @@ interface JobState {
 export const defaultJobPosting: JobPosting = {
     id: 0,
     title: '',
+    enabled: false,
     description: '',
     datePosted: null,
     jobLocation: '',
@@ -91,7 +117,9 @@ export const defaultJobPosting: JobPosting = {
     educationalRequirements: '',
     experienceRequirements: 0,
     experienceInPlaceOfEducation: true,
+    emailRecipient: '',
     filename: '',
+    applicationInstructions: '',
     timestamp: '',
 }
 
@@ -132,6 +160,7 @@ const listReducer = (state: JobPosting[] = initialJobState.list, action: JobPost
     const {type, payload} = action;
     switch (type) {
     case fetchJobsSucceeded:
+    case deleteJobSucceeded:
         return payload?.list || [];
     case saveJobSucceeded: {
         const posting = payload?.jobPosting;
@@ -153,6 +182,8 @@ const selectedReducer = (state: JobPosting = initialJobState.selected, action: J
     switch (type) {
     case jobSelected:
     case fetchSelectedSucceeded:
+    case saveJobSucceeded:
+    case saveJobPDFSucceeded:
         return {...payload?.jobPosting || defaultJobPosting};
     case jobUpdated:
         return {
@@ -181,11 +212,14 @@ const loadingSelectedReducer = (state: boolean = initialJobState.loading, action
     switch (action.type) {
     case fetchJobsRequested:
     case saveJobRequested:
+    case saveJobPDFRequested:
         return true;
     case fetchJobsSucceeded:
     case fetchJobsFailed:
     case saveJobSucceeded:
     case saveJobFailed:
+    case saveJobPDFSucceeded:
+    case saveJobPDFFailed:
         return false;
     default:
         return state;
@@ -201,6 +235,7 @@ const onlyActiveReducer = (state: boolean = initialJobState.onlyActive, action: 
         return state;
     }
 }
+
 export default combineReducers({
     list: listReducer,
     selected: selectedReducer,

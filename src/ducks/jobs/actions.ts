@@ -2,11 +2,27 @@ import {onErrorAction} from 'chums-ducks';
 import {
     defaultJobPosting,
     fetchJobsFailed,
-    fetchJobsRequested, fetchJobsSucceeded,
-    fetchJobsURL, fetchSelectedFailed, fetchSelectedRequested, fetchSelectedSucceeded, JobPosting, JobPostingsAction,
-    JobPostingThunkAction, jobSelected, jobUpdated, saveJobFailed, saveJobRequested, saveJobSucceeded,
+    fetchJobsRequested,
+    fetchJobsSucceeded,
+    fetchJobsURL,
+    postJobPostingPDFURL,
+    fetchSelectedFailed,
+    fetchSelectedRequested,
+    fetchSelectedSucceeded,
+    JobPosting,
+    JobPostingsAction,
+    JobPostingThunkAction,
+    jobSelected,
+    jobUpdated,
+    saveJobFailed,
+    saveJobPDFFailed,
+    saveJobPDFRequested, saveJobPDFSucceeded,
+    saveJobRequested,
+    saveJobSucceeded,
     selectLoading,
-    selectLoadingSelected, selectSelectedJobPosting, setActiveFilter
+    selectLoadingSelected,
+    selectSelectedJobPosting,
+    setActiveFilter, deleteJobRequested, deleteJobSucceeded, deleteJobFailed
 } from "./index";
 import {fetchHandler} from "../../fetchHandler";
 import {PropType} from "../../types";
@@ -15,7 +31,7 @@ export const jobPostingSelectedAction = (jobPosting:JobPosting = defaultJobPosti
 export const jobPostingUpdatedAction = (props:PropType):JobPostingsAction => ({type: jobUpdated, payload: {props}});
 export const filterActiveOnlyAction = (onlyActive:boolean):JobPostingsAction => ({type: setActiveFilter, payload: {onlyActive}});
 
-export const fetchJobPostings = ():JobPostingThunkAction => async (dispatch, getState) => {
+export const fetchJobPostingsAction = ():JobPostingThunkAction => async (dispatch, getState) => {
     try {
         const state = getState();
         const loading = selectLoading(state) || selectLoadingSelected(state);
@@ -33,7 +49,7 @@ export const fetchJobPostings = ():JobPostingThunkAction => async (dispatch, get
     }
 }
 
-export const fetchJobPosting = ({id}:JobPosting):JobPostingThunkAction =>
+export const fetchJobPostingAction = ({id}:JobPosting):JobPostingThunkAction =>
     async (dispatch, getState) => {
         try {
             const state = getState();
@@ -51,13 +67,82 @@ export const fetchJobPosting = ({id}:JobPosting):JobPostingThunkAction =>
             dispatch({type: fetchSelectedSucceeded, payload: {jobPosting}});
 
         } catch(err) {
-            console.debug("fetchJobPosting()", err.message);
+            console.debug("fetchJobPostingAction()", err.message);
             dispatch({type: fetchSelectedFailed});
             dispatch(onErrorAction(err, fetchSelectedFailed));
         }
 }
 
-export const saveJobPosting = ():JobPostingThunkAction =>
+export const uploadJobPDFAction = (files:FileList):JobPostingThunkAction =>
+    async (dispatch, getState) => {
+        try {
+            const state = getState();
+            const selected = selectSelectedJobPosting(state);
+            if (!selected.id) {
+                return dispatch(onErrorAction(new Error('This posting must be saved first')));
+            }
+
+            if (!files.length || files.length > 1) {
+                return dispatch(onErrorAction(new Error('No file was selected'), saveJobPDFFailed));
+            }
+            const [file] = files;
+
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'json';
+            xhr.upload.addEventListener('progress', ev => {
+                dispatch({type: saveJobPDFRequested, payload: {progress: (ev.loaded / ev.total) * 100}});
+            });
+
+            xhr.upload.addEventListener('loadstart', (ev) => {
+                dispatch({type: saveJobPDFRequested, payload: {progress: (ev.loaded / ev.total) * 100}});
+            });
+
+            xhr.upload.addEventListener('abort', (ev) => {
+                console.log(ev);
+                dispatch({type: saveJobPDFFailed});
+            });
+
+            xhr.upload.addEventListener('error', (ev) => {
+                console.log(ev);
+                dispatch({type: saveJobPDFFailed});
+            });
+
+            xhr.upload.addEventListener('timeout', (ev) => {
+                console.log(ev);
+                dispatch({type: saveJobPDFFailed});
+            });
+
+            xhr.upload.addEventListener('load', (ev) => {
+                console.log(ev);
+                dispatch({type: saveJobPDFSucceeded});
+            });
+
+            xhr.onreadystatechange = (ev) => {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const {postings, error} = xhr.response;
+                    if (postings) {
+                        dispatch({type: saveJobPDFSucceeded, payload: {jobPosting: postings[0]}});
+                    }
+                    if (error) {
+                        dispatch(onErrorAction(new Error(error), saveJobPDFFailed));
+                    }
+                }
+
+            };
+
+            const formData = new FormData();
+            formData.append(file.name, file, file.name);
+            const url = postJobPostingPDFURL(selected.id);
+            xhr.open('POST', url, true);
+            xhr.send(formData);
+        } catch(err) {
+            console.debug("()", err.message);
+            dispatch({type: saveJobPDFFailed});
+            dispatch(onErrorAction(err, saveJobPDFFailed))
+        }
+    }
+
+export const saveJobPostingAction = ():JobPostingThunkAction =>
     async (dispatch, getState) => {
         try {
             const state = getState();
@@ -73,9 +158,32 @@ export const saveJobPosting = ():JobPostingThunkAction =>
             const [jobPosting = defaultJobPosting] = postings;
             dispatch({type: saveJobSucceeded, payload: {jobPosting}});
         } catch(err) {
-            console.debug("saveJobPosting()", err.message);
+            console.debug("saveJobPostingAction()", err.message);
             dispatch({type: saveJobFailed});
             dispatch(onErrorAction(err, saveJobFailed));
         }
 }
 
+export const deleteJobPostingAction = ():JobPostingThunkAction =>
+    async (dispatch, getState) => {
+        try {
+            const state = getState();
+            const loading = selectLoading(state) || selectLoadingSelected(state);
+            if (loading) {
+                return;
+            }
+            const selected = selectSelectedJobPosting(state);
+            if (!selected || !selected.id) {
+                return;
+            }
+            dispatch({type: deleteJobRequested});
+            const method = 'delete';
+            const url = fetchJobsURL(selected.id);
+            const {postings} = await fetchHandler(url, {method})
+            dispatch({type: deleteJobSucceeded, payload: {list: postings}});
+        } catch(err) {
+            console.warn("deleteJobPostingAction()", err.message);
+            dispatch({type: deleteJobFailed});
+            dispatch(onErrorAction(err, deleteJobRequested));
+        }
+    }
