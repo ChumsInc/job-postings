@@ -19,7 +19,7 @@ ReactDOM.render(
             <App/>
         </Provider>
     </React.StrictMode>,
-    document.getElementById('app')
+    document.getElementById('job-openings')
 );
 
 // ReactDOM.render(

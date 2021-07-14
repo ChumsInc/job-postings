@@ -5,7 +5,8 @@ export async function fetchHandler(request:RequestInfo, options?:RequestInit):Pr
         if (!options) {
             options = {};
         }
-        if (options.method?.toLowerCase() === 'post') {
+        const {method = 'get'} = options;
+        if (['put', 'post', 'patch'].includes(method.toLowerCase())) {
             options.headers = {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',

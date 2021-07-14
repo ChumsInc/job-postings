@@ -1,41 +1,46 @@
-import React, {useState} from "react";
-import {Provider, useSelector} from "react-redux";
-import {renderToStaticMarkup} from 'react-dom/server';
+import React from "react";
+import {useSelector} from "react-redux";
 import {selectSelectedJobPosting} from "./index";
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import {a11yDark} from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import FormCheck from "../../components/FormCheck";
-import {createStore} from "redux";
-import {default as reducer} from "../index";
 import JobPostingRender from "../../components/JobPostingRender";
-import pretty from "pretty";
+import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
+import CopyButton from "../../components/CopyButton";
+
 
 const JobPostingPreview: React.FC = () => {
     const selected = useSelector(selectSelectedJobPosting);
-    const [viewAsRaw, setViewAsRaw] = useState(true);
-    const content = viewAsRaw
-        ? (renderToStaticMarkup(
-            <Provider store={createStore(reducer)}>
-                <JobPostingRender selected={selected}/>
-            </Provider>
-        ))
-        : null;
+    const linkUrl = `https://intranet.chums.com/apps/current-openings/?id=${selected.id}`;
+    const previewUrl = `${linkUrl}&preview=1`;
+    const validateUrl = ` https://search.google.com/test/rich-results?url=${encodeURIComponent(linkUrl)}&user_agent=1`
     return (
-        <div>
-            <div className="row g-3">
-                <div className="col-auto">
-                    <FormCheck label="Show Raw Markup" type="checkbox" onChange={setViewAsRaw} checked={viewAsRaw}/>
+        <ErrorBoundary>
+            <div>
+                <div className="row g-3 align-items-center">
+                    {!!selected.id && (
+                        <>
+                            <h3 className="col-auto">
+                                <a href={previewUrl} target="_blank"
+                                   className="btn btn-sm btn-outline-secondary">Preview</a>
+                            </h3>
+                            <h3 className="col-auto">
+                                <a href={validateUrl} target="_blank"
+                                   className="btn btn-sm btn-outline-secondary">Validate</a>
+                            </h3>
+                            <h3 className="col-auto">
+                                <CopyButton className="btn btn-sm btn-outline-primary" disabled={!selected.enabled}
+                                            copy={linkUrl}
+                                            copiedText="Link Copied">
+                                    Copy Link
+                                </CopyButton>
+                            </h3>
+                        </>
+                    )}
+                    {!selected.id && (
+                        <h3>New Posting</h3>
+                    )}
                 </div>
+                <JobPostingRender posting={selected}/>
             </div>
-            {viewAsRaw && (
-                <SyntaxHighlighter language="JavaScript" style={a11yDark} showLineNumbers wrapLines={true}>
-                    {pretty(content || '')}
-                </SyntaxHighlighter>
-            )}
-            {!viewAsRaw && (
-                <JobPostingRender selected={selected}/>
-            )}
-        </div>
+        </ErrorBoundary>
     )
 }
 

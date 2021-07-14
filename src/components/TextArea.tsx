@@ -1,23 +1,29 @@
-import React, {memo, useEffect, useState} from "react";
-import TextAreaAutosize from 'react-autosize-textarea';
+import React, {useEffect, useState} from "react";
 
 interface TextAreaProps extends React.TextareaHTMLAttributes<any> {
-    onChange: (any: any) => any,
+    onChange: (any: any) => void,
 }
 
-const TextArea: React.FC<TextAreaProps> = ({value, children, onChange, ...props}) => {
+const TextArea: React.FC<TextAreaProps> = ({
+                                         value = '',
+                                        rows = 3,
+                                         children,
+                                         onChange,
+                                         ...props
+                                     }) => {
+    const [currentValue, setValue] = useState(String(value || ''));
     const [timer, setTimer] = useState(0);
-    const [currentValue, setValue] = useState(value || '');
     useEffect(() => {
-        setValue(value || '');
+        setValue(String(value));
         return () => window.clearTimeout(timer);
     }, [value]);
+
 
     const delayedChangeHandler = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
         clearTimeout(timer);
         setValue(ev.target.value);
         const _timer = window.setTimeout(() => {
-            onChange(ev.target.value);
+            changeHandler(ev);
         }, 350);
         setTimer(_timer);
     }
@@ -25,15 +31,15 @@ const TextArea: React.FC<TextAreaProps> = ({value, children, onChange, ...props}
     const changeHandler = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
         clearTimeout(timer);
         setValue(ev.target.value);
-        onChange(ev.target.value);
+        if (String(value) !== ev.target.value) {
+            onChange(ev.target.value);
+        }
     }
 
     return (
-        <TextAreaAutosize className="form-control form-control-sm" value={currentValue}
-                          {...props}
-                          rows={3} maxRows={12}
-                          onChange={delayedChangeHandler} onBlur={changeHandler}/>
+        <textarea className="form-control form-control-sm" value={currentValue} rows={rows} {...props}
+               onChange={delayedChangeHandler} onBlur={changeHandler}/>
     )
 }
 
-export default memo(TextArea);
+export default TextArea;

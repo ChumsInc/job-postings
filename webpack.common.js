@@ -1,5 +1,4 @@
 const path = require('path');
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 require('dotenv').config();
 
@@ -17,7 +16,7 @@ module.exports = {
                 test: /\.jsx?$/,
                 use: ['babel-loader'],
                 exclude: /node_modules/,
-                include: "/node_modules/chums-components/",
+                // include: "/node_modules/chums-components/",
             },
             {
                 test: /\.css$/,
@@ -57,7 +56,7 @@ module.exports = {
     },
     output: {
         path: path.join(__dirname, 'public/js'),
-        filename: "[location].js",
+        filename: "[name].js",
         sourceMapFilename: '[file].map',
         publicPath: '/',
     },

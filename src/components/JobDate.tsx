@@ -8,7 +8,7 @@ interface JobDateProps {
 const JobDate:React.FC<JobDateProps> = ({date, schemaTag}) => {
     if (!date || !new Date(date).getTime()) {
         return (
-            <Alert color="warning" title="Warning:">Invalid date for field '{schemaTag}'</Alert>
+            <Alert color="warning" title="Warning">Invalid date for field '{schemaTag}'</Alert>
         )
     }
     return (
