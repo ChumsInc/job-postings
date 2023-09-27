@@ -1,1 +1,1 @@
-<div id="job-openings"></div>
+<div id="app"></div>
