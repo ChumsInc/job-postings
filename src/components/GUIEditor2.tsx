@@ -1,6 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
+import {ErrorBoundary} from "react-error-boundary";
 import {Editor, IAllProps} from '@tinymce/tinymce-react';
+import ErrorBoundaryFallbackAlert from "../app/ErrorBoundaryFallbackAlert";
+import {useSelector} from "react-redux";
+import {loadTinyMCEKey, selectTinyMCEKey} from "../ducks/api-key";
+import {useAppDispatch} from "../app/configureStore";
 
 const defaultEditorOptions: IAllProps['init'] = {
     height: 350,
@@ -47,10 +51,16 @@ interface GUIMceEditorProps {
     onChangeTimer?: number
 }
 
-const GUIEditor: React.FC<GUIMceEditorProps> = ({value, options = {}, onChange, onChangeTimer = 1000}) => {
+const GUIEditor2 = ({value, options = {}, onChange, onChangeTimer = 1000}:GUIMceEditorProps) => {
+    const dispatch = useAppDispatch();
     const editorRef = useRef<Editor>(null);
+    const apiKey = useSelector(selectTinyMCEKey);
     const [timer, setTimer] = useState(0);
     const [content, setContent] = useState(value);
+
+    useEffect(() => {
+        dispatch(loadTinyMCEKey());
+    }, []);
 
     useEffect(() => {
         setContent(value || '');
@@ -83,10 +93,13 @@ const GUIEditor: React.FC<GUIMceEditorProps> = ({value, options = {}, onChange, 
         ...defaultEditorOptions,
         ...options
     }
+    if (!apiKey) {
+        return null;
+    }
     return (
-        <ErrorBoundary>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
             <Editor
-                apiKey="dtw3713kp9s6j1pxq59ga10o1xeimkkmpiwki2kb2q5wxzvz"
+                apiKey={apiKey}
                 ref={editorRef}
                 initialValue={content || ''}
                 init={editorOptions}
@@ -96,4 +109,4 @@ const GUIEditor: React.FC<GUIMceEditorProps> = ({value, options = {}, onChange, 
         </ErrorBoundary>
     )
 }
-export default GUIEditor;
+export default GUIEditor2;

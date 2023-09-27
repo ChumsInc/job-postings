@@ -1,11 +1,13 @@
 import React from "react";
-import {EmploymentTypes, JobPosting} from "../ducks/jobs";
+import {JobPosting} from "../types";
 import {default as JobLocation, jobLocationLD} from "./JobLocation";
 import JobDate from "./JobDate";
 import EducationalRequirements from "./EducationalRequirements";
-import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
+import {ErrorBoundary} from "react-error-boundary";
 import './job-openings.css'
-import {Alert} from "chums-ducks";
+import {Alert} from "chums-components";
+import {EmploymentTypes} from "../ducks/jobs/utils";
+import ErrorBoundaryFallbackAlert from "../app/ErrorBoundaryFallbackAlert";
 
 interface JobPostingProps {
     posting: JobPosting
@@ -59,7 +61,7 @@ const JobPostingRender: React.FC<JobPostingProps> = ({posting}) => {
     }
 
     return (
-        <ErrorBoundary>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
             <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(ldJSON)}}/>
             <section className="job-opening" id={'job-posting--' + id}>
                 <h2 className="job-opening--title">{title}</h2>

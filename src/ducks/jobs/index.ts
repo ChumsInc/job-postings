@@ -1,245 +1,161 @@
-import {Action, combineReducers} from "redux";
-import {ThunkAction} from "redux-thunk";
-import {RootState} from "../index";
-import {PropType} from "../../types";
-import {AlertAction} from "chums-ducks";
-import {createSelector} from "@reduxjs/toolkit";
+import {RootState} from "../../app/configureStore";
+import {JobPosting} from "../../types";
+import {createReducer, createSelector} from "@reduxjs/toolkit";
+import dayjs from "dayjs";
+import {SortProps} from "chums-components";
+import {
+    loadJobPosting,
+    loadJobPostings,
+    removeJobPosting,
+    saveJobPosting,
+    toggleShowInactive,
+    updateJobPosting,
+    uploadJobPDF
+} from "./actions";
+import {Editable} from "chums-types";
+import {defaultJobPosting} from "./utils";
 
-export const fetchJobsRequested = 'app/jobs/fetch-requested';
-export const fetchJobsSucceeded = 'app/jobs/fetch-succeeded';
-export const fetchJobsFailed = 'app/jobs/fetch-failed';
-export const fetchSelectedRequested = 'app/jobs/fetch-selected-requested';
-export const fetchSelectedSucceeded = 'app/jobs/fetch-selected-succeeded';
-export const fetchSelectedFailed = 'app/jobs/fetch-selected-failed';
+export type ActionStatus = 'idle' | 'loading' | 'saving' | 'deleting' | 'uploading';
 
-export const jobSelected = 'app/jobs/selected';
-export const jobUpdated = 'app/jobs/updated';
-
-export const saveJobRequested = 'app/jobs/save-requested';
-export const saveJobSucceeded = 'app/jobs/save-succeeded';
-export const saveJobFailed = 'app/jobs/save-failed';
-
-export const deleteJobRequested = 'app/jobs/delete-requested';
-export const deleteJobSucceeded = 'app/jobs/delete-succeeded';
-export const deleteJobFailed = 'app/jobs/delete-failed';
-
-export const saveJobPDFRequested = 'app/jobs/save-pdf-requested';
-export const saveJobPDFSucceeded = 'app/jobs/save-pdf-succeeded';
-export const saveJobPDFFailed = 'app/jobs/save-pdf-failed';
-
-export const setActiveFilter = 'app/jobs/filter-active';
-
-
-export const fetchJobsURL = (id?: number) => `/api/timeclock-admin/job-postings/${encodeURIComponent(String(id || ''))}`;
-export const postJobPostingPDFURL = (id: number) => fetchJobsURL(id) + '/upload-pdf';
-
-export declare type ValidEmploymentType =
-    'FULL_TIME'
-    | 'PART_TIME'
-    | 'CONTRACTOR'
-    | 'TEMPORARY'
-    | 'INTERN'
-    | 'VOLUNTEER'
-    | 'PER_DIEM'
-    | 'OTHER';
-
-export type EmploymentTypeMap = { [employmentType in ValidEmploymentType]: string }
-
-export const EmploymentTypes: EmploymentTypeMap = {
-    FULL_TIME: 'Full Time',
-    PART_TIME: 'Part Time',
-    CONTRACTOR: 'Contractor',
-    TEMPORARY: 'Temporary',
-    INTERN: 'Intern',
-    VOLUNTEER: 'Volunteer',
-    PER_DIEM: 'Per Diem',
-    OTHER: 'Other',
+export interface JobsState {
+    list: {
+        entries: JobPosting[];
+        loading: boolean;
+        showInactive: boolean;
+        sort: SortProps<JobPosting>
+    },
+    current: {
+        entry: JobPosting & Editable;
+        status: ActionStatus;
+    };
 }
 
-export interface BaseSalary {
-    value?: number,
-    minValue?: number,
-    maxValue?: number,
-    unitText: string,
-}
-
-export interface JobPosting {
-    id: number,
-    title: string,
-    enabled: boolean,
-    description: string,
-    datePosted: string | null,
-    jobLocation: string,
-    validThrough: string | null,
-    baseSalary?: BaseSalary | null,
-    employmentType: ValidEmploymentType,
-    educationalRequirements: string,
-    experienceRequirements: number
-    experienceInPlaceOfEducation: boolean,
-    filename: string,
-    emailRecipient?: string,
-    applicationInstructions?: string,
-    timestamp: string,
-    changed?: boolean,
-}
-
-export interface JobPostingsAction extends Action {
-    payload?: {
-        list?: JobPosting[],
-        jobPosting?: JobPosting,
-        props?: PropType,
-        onlyActive?: boolean,
-        progress?: number,
+export const initialJobsState: JobsState = {
+    list: {
+        entries: [],
+        loading: false,
+        showInactive: false,
+        sort: {field: 'title', ascending: true}
+    },
+    current: {
+        entry: {...defaultJobPosting},
+        status: 'idle',
     }
 }
 
-export interface JobPostingThunkAction extends ThunkAction<void, RootState, unknown, JobPostingsAction | AlertAction> {
+export const defaultSort: SortProps<JobPosting> = {field: "id", ascending: true};
+
+export const listingSorter = (sort: SortProps<JobPosting>) => (a: JobPosting, b: JobPosting) => {
+    const {field, ascending} = sort;
+    const sortMod = ascending ? 1 : -1
+    switch (field) {
+        case 'title':
+            return (
+                a[field].toLowerCase() === b[field].toLowerCase()
+                    ? a.id - b.id
+                    : (a[field].toLowerCase() > b[field].toLowerCase() ? 1 : -1)
+            ) * sortMod;
+        default:
+            return a.id - b.id;
+    }
 }
 
-interface JobState {
-    list: JobPosting[],
-    selected: JobPosting,
-    loading: boolean,
-    loadingSelected: boolean,
-    onlyActive: boolean,
-}
+export const selectLoading = (state: RootState) => state.jobs.list.loading;
+export const selectList = (state: RootState) => state.jobs.list.entries;
+export const selectListSort = (state: RootState) => state.jobs.list.sort;
+export const selectCurrentPosting = (state: RootState) => state.jobs.current.entry;
+export const selectShowInactive = (state: RootState) => state.jobs.list.showInactive;
+export const selectCurrentStatus = (state: RootState) => state.jobs.current.status;
 
-export const defaultJobPosting: JobPosting = {
-    id: 0,
-    title: '',
-    enabled: false,
-    description: '',
-    datePosted: null,
-    jobLocation: '',
-    validThrough: null,
-    baseSalary: null,
-    employmentType: 'FULL_TIME',
-    educationalRequirements: '',
-    experienceRequirements: 0,
-    experienceInPlaceOfEducation: true,
-    emailRecipient: '',
-    filename: '',
-    applicationInstructions: '',
-    timestamp: '',
-}
-
-const initialJobState: JobState = {
-    list: [],
-    selected: defaultJobPosting,
-    loading: false,
-    loadingSelected: false,
-    onlyActive: false,
-}
-
-export const selectLoading = (state: RootState) => state.jobs.loading;
-export const selectLoadingSelected = (state: RootState) => state.jobs.loadingSelected;
-export const selectSelectedJobPosting = (state: RootState) => state.jobs.selected;
-export const selectOnlyActive = (state: RootState) => state.jobs.onlyActive;
-
-/**
- * @desc Returns all postings (if onlyActive === false) or future postings as well as current postings (if onlyActive === true)
- */
 export const selectJobPostings = createSelector(
-    [
-        (state: RootState) => state.jobs.list,
-        (state: RootState) => state.jobs.onlyActive,
-    ],
-    (list, onlyActive) => {
+    [selectList, selectShowInactive, selectListSort],
+    (list, showInactive, sort) => {
         const now = new Date();
         // return future postings as well as current postings
-        return list.filter(({
-                                datePosted,
-                                validThrough
-                            }) => !onlyActive || (!!datePosted && (!validThrough || new Date(validThrough) > now)));
+        return list.filter((val) => showInactive || (!!val.datePosted && (!val.validThrough || dayjs(val.validThrough).isAfter(now))))
+            .sort(listingSorter(sort));
     }
 )
 
-const jobDefaultSort = (a: JobPosting, b: JobPosting) => a.id - b.id;
+const jobsReducer = createReducer(initialJobsState, (builder) => {
+    builder
+        .addCase(loadJobPostings.pending, (state) => {
+            state.list.loading = true;
+        })
+        .addCase(loadJobPostings.fulfilled, (state, action) => {
+            state.list.loading = false;
+            state.list.entries = action.payload.sort(listingSorter(defaultSort));
+            if (state.current.entry && state.current.entry.id > 0) {
+                const [entry] = action.payload.filter(job => job.id === state.current.entry?.id);
+                state.current.entry = entry ?? {...defaultJobPosting};
+            }
+        })
+        .addCase(loadJobPostings.rejected, (state, action) => {
+            state.list.loading = false;
+        })
+        .addCase(loadJobPosting.pending, (state, action) => {
+            state.current.status = 'loading';
+            const [entry] = state.list.entries.filter(e => e.id === action.meta.arg);
+            state.current.entry = entry ?? {...defaultJobPosting};
+        })
+        .addCase(loadJobPosting.fulfilled, (state, action) => {
+            state.current.status = 'idle';
+            state.current.entry = action.payload ?? {...defaultJobPosting};
+            if (action.payload) {
+                state.list.entries = [
+                    ...state.list.entries.filter(e => e.id !== action.payload?.id),
+                    action.payload
+                ].sort(listingSorter(defaultSort));
+            }
+        })
+        .addCase(loadJobPosting.rejected, (state) => {
+            state.current.status = 'idle';
+        })
+        .addCase(uploadJobPDF.pending, (state) => {
+            state.current.status = 'uploading';
+        })
+        .addCase(uploadJobPDF.fulfilled, (state, action) => {
+            state.current.status = 'idle';
+        })
+        .addCase(uploadJobPDF.rejected, (state) => {
+            state.current.status = 'idle';
+        })
+        .addCase(saveJobPosting.pending, (state) => {
+            state.current.status = 'saving';
+        })
+        .addCase(saveJobPosting.fulfilled, (state, action) => {
+            state.current.entry = action.payload ?? {...defaultJobPosting};
+            state.current.status = 'idle';
+            if (action.payload) {
+                state.list.entries = [
+                    ...state.list.entries.filter(e => e.id !== action.payload?.id),
+                    action.payload
+                ].sort(listingSorter(defaultSort));
+            }
+        })
+        .addCase(saveJobPosting.rejected, (state) => {
+            state.current.status = 'idle';
+        })
+        .addCase(removeJobPosting.pending, (state) => {
+            state.current.status = 'deleting';
+        })
+        .addCase(removeJobPosting.fulfilled, (state, action) => {
+            state.list.entries = action.payload.sort(listingSorter(defaultSort));
+            state.current.entry = {...defaultJobPosting};
+            state.current.status = 'idle';
+        })
+        .addCase(removeJobPosting.rejected, (state) => {
+            state.current.status = 'idle';
+        })
+        .addCase(toggleShowInactive, (state, action) => {
+            state.list.showInactive = action.payload ?? !state.list.showInactive;
+        })
+        .addCase(updateJobPosting, (state, action) => {
+            if (state.current.entry) {
+                state.current.entry = {...state.current.entry, ...action.payload, changed: true};
+            }
+        })
 
-const listReducer = (state: JobPosting[] = initialJobState.list, action: JobPostingsAction) => {
-    const {type, payload} = action;
-    switch (type) {
-    case fetchJobsSucceeded:
-    case deleteJobSucceeded:
-        return payload?.list || [];
-    case saveJobSucceeded: {
-        const posting = payload?.jobPosting;
-        if (!posting) {
-            return state;
-        }
-        return [
-            ...state.filter(j => j.id !== posting.id),
-            posting,
-        ].sort(jobDefaultSort)
-    }
-    default:
-        return state;
-    }
-}
+});
 
-const selectedReducer = (state: JobPosting = initialJobState.selected, action: JobPostingsAction) => {
-    const {type, payload} = action;
-    switch (type) {
-    case jobSelected:
-    case fetchSelectedSucceeded:
-    case saveJobSucceeded:
-    case saveJobPDFSucceeded:
-        return {...payload?.jobPosting || defaultJobPosting};
-    case jobUpdated:
-        return {
-            ...state,
-            ...payload?.props,
-            changed: true,
-        }
-    default:
-        return state;
-    }
-}
-
-const loadingReducer = (state: boolean = initialJobState.loading, action: JobPostingsAction) => {
-    switch (action.type) {
-    case fetchJobsRequested:
-        return true;
-    case fetchJobsSucceeded:
-    case fetchJobsFailed:
-        return false;
-    default:
-        return state;
-    }
-}
-
-const loadingSelectedReducer = (state: boolean = initialJobState.loading, action: JobPostingsAction) => {
-    switch (action.type) {
-    case fetchJobsRequested:
-    case saveJobRequested:
-    case saveJobPDFRequested:
-        return true;
-    case fetchJobsSucceeded:
-    case fetchJobsFailed:
-    case saveJobSucceeded:
-    case saveJobFailed:
-    case saveJobPDFSucceeded:
-    case saveJobPDFFailed:
-        return false;
-    default:
-        return state;
-    }
-}
-
-const onlyActiveReducer = (state: boolean = initialJobState.onlyActive, action: JobPostingsAction) => {
-    const {type, payload} = action;
-    switch (type) {
-    case setActiveFilter:
-        return payload?.onlyActive || false;
-    default:
-        return state;
-    }
-}
-
-export default combineReducers({
-    list: listReducer,
-    selected: selectedReducer,
-    loading: loadingReducer,
-    loadingSelected: loadingSelectedReducer,
-    onlyActive: onlyActiveReducer,
-})
+export default jobsReducer;

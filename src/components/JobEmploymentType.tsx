@@ -1,5 +1,6 @@
 import React from 'react';
-import {EmploymentTypes, ValidEmploymentType} from "../ducks/jobs";
+import {ValidEmploymentType} from "../types";
+import {EmploymentTypes} from "../ducks/jobs/utils";
 
 interface JobEmploymentTypeProps {
     type: ValidEmploymentType,

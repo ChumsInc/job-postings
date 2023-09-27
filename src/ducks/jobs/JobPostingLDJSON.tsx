@@ -1,6 +1,7 @@
 import React from "react";
-import {JobPosting} from "./index";
-import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
+import {JobPosting} from "../../types";
+import {ErrorBoundary} from "react-error-boundary";
+import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
 
 interface JobPostingLDJSONProps {
     selected: JobPosting
@@ -46,7 +47,7 @@ const jobLocation = (jobLocation:string):JobLocation => {
 const JobPostingLDJSON: React.FC<JobPostingLDJSONProps> = ({selected}) => {
     const location = jobLocation(selected.jobLocation);
     return (
-        <ErrorBoundary>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
             <div vocab="https://schema.org" typeof="JobPostingRender">
                 <meta property="specialCommitments" content="VeteranCommit" />
                 <h2 property="title">{selected.title}</h2>
