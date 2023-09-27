@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert} from "chums-ducks";
+import {Alert} from "chums-components";
 
 interface JobDateProps {
     date: string|Date|null,

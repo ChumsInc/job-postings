@@ -1,34 +1,36 @@
-import React, {useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {defaultJobPosting, selectJobPostings, selectOnlyActive} from "./index";
-import {filterActiveOnlyAction, fetchJobPostingsAction, jobPostingSelectedAction} from './actions';
-import FormCheck from "../../components/FormCheck";
+import React, {ChangeEvent, useEffect, useId} from "react";
+import {useSelector} from "react-redux";
+import {selectJobPostings, selectShowInactive} from "./index";
+import {loadJobPosting, loadJobPostings, toggleShowInactive} from './actions';
 import JobPostingRow from "./JobPostingRow";
-import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
+import {ErrorBoundary} from "react-error-boundary";
+import {useAppDispatch} from "../../app/configureStore";
+import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
+import {FormCheck} from "chums-components";
 
-const JobPostingsList:React.FC = () => {
-    const dispatch = useDispatch();
+const JobPostingsList: React.FC = () => {
+    const dispatch = useAppDispatch();
     const list = useSelector(selectJobPostings);
-    const onlyActive = useSelector(selectOnlyActive);
+    const showInactive = useSelector(selectShowInactive);
+    const id = useId();
 
-    const setActive = (active:boolean) => dispatch(filterActiveOnlyAction(active))
-    const onReload = () => dispatch(fetchJobPostingsAction());
-    const onClickNew = () => dispatch(jobPostingSelectedAction(defaultJobPosting))
+    const setActive = (ev: ChangeEvent<HTMLInputElement>) => dispatch(toggleShowInactive(ev.target.checked))
+    const onReload = () => dispatch(loadJobPostings());
+    const onClickNew = () => dispatch(loadJobPosting(0));
 
     useEffect(() => {
-        dispatch(fetchJobPostingsAction());
+        dispatch(loadJobPostings());
     }, [])
 
     return (
         <div className="">
             <div className="row g-3">
                 <div className="col-auto">
-                    <label>Show</label>
+                    <label htmlFor={id}>Show Inactive</label>
                 </div>
                 <div className="col-auto">
                     <div className="form-check-inline">
-                        <FormCheck type="radio" checked={onlyActive} inline onChange={() => setActive(true)}>Active</FormCheck>
-                        <FormCheck type="radio" checked={!onlyActive} inline onChange={() => setActive(false)}>All</FormCheck>
+                        <FormCheck type="checkbox" checked={showInactive} onChange={setActive} id={id} label="" />
                     </div>
                 </div>
                 <div className="col-auto">
@@ -38,7 +40,7 @@ const JobPostingsList:React.FC = () => {
                     <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClickNew}>New</button>
                 </div>
             </div>
-            <ErrorBoundary>
+            <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
                 <table className="table table-hover table-sm">
                     <thead>
                     <tr>
@@ -49,7 +51,7 @@ const JobPostingsList:React.FC = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {list.map(posting => <JobPostingRow key={posting.id} posting={posting} /> )}
+                    {list.map(posting => <JobPostingRow key={posting.id} posting={posting}/>)}
                     </tbody>
                     <tfoot>
                     <tr>

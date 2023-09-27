@@ -1,6 +1,5 @@
 const path = require('path');
 
-require('dotenv').config();
 
 module.exports = {
     entry: './src/index.tsx',
@@ -8,15 +7,13 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: ['ts-loader'],
+                use: 'ts-loader',
                 exclude: /node_modules/,
-                // include: "/node_modules/chums-ducks/",
             },
             {
-                test: /\.jsx?$/,
-                use: ['babel-loader'],
+                test: /\.js$/,
                 exclude: /node_modules/,
-                // include: "/node_modules/chums-components/",
+                use: ['babel-loader']
             },
             {
                 test: /\.css$/,
@@ -38,6 +35,8 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
+    plugins: [
+    ],
     optimization: {
         splitChunks: {
             cacheGroups: {

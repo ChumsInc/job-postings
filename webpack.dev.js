@@ -1,5 +1,4 @@
 const {merge} = require('webpack-merge');
-const webpack = require('webpack');
 const common = require('./webpack.common.js');
 const path = require('path');
 
@@ -17,24 +16,18 @@ const localProxy = {
 module.exports = merge(common, {
     mode: 'development',
     devServer: {
-        contentBase: [path.join(__dirname, 'public'), __dirname],
+        allowedHosts: 'auto',
+        static: {
+            directory: path.join(__dirname, 'public'),
+            serveIndex: true,
+            watch: false,
+        },
         hot: true,
         proxy: {
             '/api': {...localProxy},
-            '/images/': {...localProxy},
-            '/timeclock/': {...localProxy},
-            '/pdf/': {...localProxy},
-            '/files/': {...localProxy},
-            // '/node_modules/': {...localProxy},
-            '/node-chums/': {...localProxy},
-            '/node-dev/': {...localProxy},
-            '/node-sage/': {...localProxy},
-            '/sage/': {...localProxy},
-            '/version': {...localProxy},
-        }
+        },
+        watchFiles: path.join(__dirname, 'src/**/*')
     },
     devtool: 'inline-source-map',
-    plugins: [
-        new webpack.HotModuleReplacementPlugin(),
-    ]
+    plugins: []
 });

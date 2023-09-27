@@ -1,18 +1,19 @@
 import React from "react";
 import {useSelector} from "react-redux";
-import {selectSelectedJobPosting} from "./index";
+import {selectCurrentPosting} from "./index";
 import JobPostingRender from "../../components/JobPostingRender";
-import ErrorBoundary from "chums-ducks/dist/components/ErrorBoundary";
+import {ErrorBoundary} from "react-error-boundary";
 import CopyButton from "../../components/CopyButton";
+import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
 
 
 const JobPostingPreview: React.FC = () => {
-    const selected = useSelector(selectSelectedJobPosting);
+    const selected = useSelector(selectCurrentPosting);
     const linkUrl = `https://intranet.chums.com/apps/current-openings/?id=${selected.id}`;
     const previewUrl = `${linkUrl}&preview=1`;
     const validateUrl = ` https://search.google.com/test/rich-results?url=${encodeURIComponent(linkUrl)}&user_agent=1`
     return (
-        <ErrorBoundary>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
             <div>
                 <div className="row g-3 align-items-center">
                     {!!selected.id && (
