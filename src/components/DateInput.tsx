@@ -56,7 +56,7 @@ const DateInput: React.FC<DateInputProps> = ({
         clearTimeout(timer);
         setValue(ev.target.value);
         if (String(value) !== ev.target.value) {
-            onChange(ev.target.value);
+            onChange(ev);
         }
     }
 

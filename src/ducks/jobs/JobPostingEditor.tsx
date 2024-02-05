@@ -45,13 +45,13 @@ const JobPostingEditor = () => {
             case 'datePosted':
                 return dispatch(updateJobPosting({
                     [field]: dayjs(ev.target.valueAsDate).isValid()
-                        ? dayjs(ev.target.valueAsDate).startOf('day').toISOString()
+                        ? dayjs(ev.target.valueAsDate).add(new Date().getTimezoneOffset(), 'minutes').startOf('day').toISOString()
                         : null
                 }))
             case 'validThrough':
                 return dispatch(updateJobPosting({
                     [field]: dayjs(ev.target.valueAsDate).isValid()
-                        ? dayjs(ev.target.valueAsDate).endOf('day').toISOString()
+                        ? dayjs(ev.target.valueAsDate).add(new Date().getTimezoneOffset(), 'minutes').endOf('day').toISOString()
                         : null
                 }));
             case 'enabled':
@@ -122,7 +122,8 @@ const JobPostingEditor = () => {
                                placeholder="Job Posting Title"/>
                     </FormColumn>
                     <FormColumn label="Date Posted">
-                        <DateInput value={posting.datePosted || ''} required
+                        <input value={dayjs(posting.datePosted).isValid() ? dayjs(posting.datePosted).format('YYYY-MM-DD') : ''} required
+                               type="date" className="form-control form-control-sm"
                                    onChange={changeHandler('datePosted')}
                                    placeholder="Date Posted"/>
                         <small className="text-muted">
@@ -131,9 +132,10 @@ const JobPostingEditor = () => {
                         </small>
                     </FormColumn>
                     <FormColumn label="Valid Through">
-                        <DateInput value={posting.validThrough || ''}
+                        <input value={dayjs(posting.validThrough).isValid() ? dayjs(posting.validThrough).format('YYYY-MM-DD') : ''}
+                               type="date" className="form-control form-control-sm"
                                    onChange={changeHandler('validThrough')}
-                                   min={posting.datePosted || ''}
+                                   min={dayjs(posting.datePosted).isValid() ? dayjs(posting.datePosted).format('YYYY-MM-DD') : ''}
                                    placeholder="Valid Through"/>
                         <small className="text-muted">
                             You can turn off a posting be setting it's '<strong>valid through</strong>' date to a date
