@@ -1,39 +1,38 @@
 import React, {useEffect, useState} from "react";
-import format from 'date-fns/format';
-import parseISO from 'date-fns/parseISO';
+import dayjs from 'dayjs';
 
-declare type DateInputType = 'date'|'datetime-local'|'time';
+declare type DateInputType = 'date' | 'datetime-local' | 'time';
 
 interface DateInputProps extends React.InputHTMLAttributes<any> {
     type?: DateInputType,
-    value?: string|number,
+    value?: string | number,
     onChange: (any: any) => void,
 }
 
-const dateValue = (date:string|number|Date|null, type: DateInputType = 'date'):string => {
+const dateValue = (date: string | number | Date | null, type: DateInputType = 'date'): string => {
     if (!date || !new Date(date).getTime()) {
         return '';
     }
-    let d = new Date(typeof date === 'string' ? parseISO(date) : date);
+    const d = dayjs(date);
 
     switch (type) {
-    case 'time':
-        return format(d, 'HH:mm');
-    case 'datetime-local':
-        return format(d, "yyyy-MM-dd'T'HH:mm");
-    case 'date':
-    default:
-        return format(d, 'yyyy-MM-dd');
+        case 'time':
+            return d.format('HH:mm');
+        case 'datetime-local':
+            return d.format("YYYY-MM-DD'T'HH:mm");
+        case 'date':
+        default:
+            return d.format('YYYY-MM-DD');
     }
 }
 
 const DateInput: React.FC<DateInputProps> = ({
-                                         type = 'date',
-                                         value = '',
-                                         children,
-                                         onChange,
-                                         ...props
-                                     }) => {
+                                                 type = 'date',
+                                                 value = '',
+                                                 children,
+                                                 onChange,
+                                                 ...props
+                                             }) => {
     const [currentValue, setValue] = useState(value || '');
     const [timer, setTimer] = useState(0);
 

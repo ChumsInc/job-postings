@@ -1,4 +1,4 @@
-import {fetchJSON} from "chums-components";
+import {fetchJSON} from "@chumsinc/ui-utils";
 import {createAsyncThunk, createReducer} from "@reduxjs/toolkit";
 import {RootState} from "../../app/configureStore";
 
@@ -15,7 +15,7 @@ export const initialState: ApiKeyState = {
 async function fetchTinyMCEAPIKey(): Promise<string | null> {
     try {
         const response = await fetchJSON<{ key: string | null }>('/api/keys/tiny-mce.json');
-        return response.key ?? null;
+        return response?.key ?? null;
     } catch (err: unknown) {
         if (err instanceof Error) {
             console.debug("fetchTinyAPIKey()", err.message);

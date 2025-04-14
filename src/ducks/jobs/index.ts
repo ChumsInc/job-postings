@@ -2,7 +2,7 @@ import {RootState} from "../../app/configureStore";
 import {JobPosting} from "../../types";
 import {createReducer, createSelector} from "@reduxjs/toolkit";
 import dayjs from "dayjs";
-import {SortProps} from "chums-components";
+import {Editable, SortProps} from "chums-types";
 import {
     loadJobPosting,
     loadJobPostings,
@@ -12,7 +12,6 @@ import {
     updateJobPosting,
     uploadJobPDF
 } from "./actions";
-import {Editable} from "chums-types";
 import {defaultJobPosting} from "./utils";
 
 export type ActionStatus = 'idle' | 'loading' | 'saving' | 'deleting' | 'uploading';

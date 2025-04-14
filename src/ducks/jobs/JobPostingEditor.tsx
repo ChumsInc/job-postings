@@ -1,20 +1,21 @@
-import React, {ChangeEvent} from "react";
+import React, {ChangeEvent, useId} from "react";
 import {useSelector} from "react-redux";
 import {selectCurrentPosting} from "./index";
 import {loadJobPosting, removeJobPosting, saveJobPosting, updateJobPosting,} from "./actions";
 import classNames from "classnames";
-import {Badge, FormCheck, FormColumn, Input} from "chums-components";
-import Select from "../../components/Select";
-import DateInput from "../../components/DateInput";
 import {ErrorBoundary} from "react-error-boundary";
 import GUIEditor2 from "../../components/GUIEditor2";
 import JobPostingPDFSelector from "./JobPostingPDFSelector";
-import TextArea from "../../components/TextArea";
 import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
 import {useAppDispatch} from "../../app/configureStore";
 import {JobPosting, ValidEmploymentType} from "../../types";
 import dayjs from "dayjs";
 import {EmploymentTypes} from "./utils";
+import {Badge, Form, FormControl, FormSelect, FormText, InputGroup, Stack} from "react-bootstrap";
+import FormCheck from "react-bootstrap/FormCheck";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
 
 interface JobPostingIconProps {
     id: number,
@@ -33,12 +34,16 @@ const JobPostingIcon = ({id, changed, datePosted, validThrough}: JobPostingIconP
         'text-info': datePosted && new Date(datePosted) > now && (!validThrough || new Date(validThrough) > now),
     }
     return (
-        <Badge color={changed ? 'warning' : 'light'} className="ms-3"><span className={classNames(className)}/></Badge>
+        <Badge bg={changed ? 'warning' : 'light'} className="ms-3"><span className={classNames(className)}/></Badge>
     )
 }
 const JobPostingEditor = () => {
     const dispatch = useAppDispatch();
     const posting = useSelector(selectCurrentPosting);
+    const titleId = useId();
+    const jobPostingDateId = useId();
+    const validThruId = useId();
+    const filenameId = useId();
 
     const changeHandler = (field: keyof JobPosting) => (ev: ChangeEvent<HTMLInputElement>) => {
         switch (field) {
@@ -102,7 +107,7 @@ const JobPostingEditor = () => {
 
     return (
         <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
-            <form onSubmit={onSubmit}>
+            <Form onSubmit={onSubmit}>
                 <div className="row g-3 sticky-top align-items-center mb-3 bg-light">
                     <h3 className="col">
                         {posting.title || 'Position Title'}
@@ -116,151 +121,186 @@ const JobPostingEditor = () => {
                     </div>
                 </div>
                 <div>
-                    <FormColumn label="Title">
-                        <Input value={posting.title} onChange={changeHandler('title')}
-                               required
-                               placeholder="Job Posting Title"/>
-                    </FormColumn>
-                    <FormColumn label="Date Posted">
-                        <input value={dayjs(posting.datePosted).isValid() ? dayjs(posting.datePosted).format('YYYY-MM-DD') : ''} required
-                               type="date" className="form-control form-control-sm"
-                                   onChange={changeHandler('datePosted')}
-                                   placeholder="Date Posted"/>
-                        <small className="text-muted">
-                            You can set a future date to schedule a job posting. Posting a date in the future is a good
-                            way to preview the posting before making it live.
-                        </small>
-                    </FormColumn>
-                    <FormColumn label="Valid Through">
-                        <input value={dayjs(posting.validThrough).isValid() ? dayjs(posting.validThrough).format('YYYY-MM-DD') : ''}
-                               type="date" className="form-control form-control-sm"
-                                   onChange={changeHandler('validThrough')}
-                                   min={dayjs(posting.datePosted).isValid() ? dayjs(posting.datePosted).format('YYYY-MM-DD') : ''}
-                                   placeholder="Valid Through"/>
-                        <small className="text-muted">
-                            You can turn off a posting be setting it's '<strong>valid through</strong>' date to a date
-                            in the past. Once the '<strong>valid through</strong>' date is passed, the posting will
-                            no longer be shown on the websites.
-                        </small>
-                    </FormColumn>
-                    <FormColumn label="Job Description PDF">
-                        {!!posting.filename && (
-                            <div className="row g-3">
-                                <div className="col">
-                                    <a href={`https://intranet.chums.com/pdf/jobs/${posting.filename}`}
-                                       target="_blank">Download</a>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label htmlFor={titleId} column sm={3}>Title</Form.Label>
+                        <Col sm={9}>
+                            <FormControl value={posting.title} onChange={changeHandler('title')}
+                                         size="sm" id={titleId}
+                                         required
+                                         placeholder="Job Posting Title"/>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label htmlFor={jobPostingDateId} column sm={3}>Date Posted</Form.Label>
+                        <Col sm={9}>
+                            <FormControl type="date" size="sm" id={jobPostingDateId}
+                                         value={dayjs(posting.datePosted).isValid()
+                                             ? dayjs(posting.datePosted).format('YYYY-MM-DD')
+                                             : ''}
+                                         required
+                                         onChange={changeHandler('datePosted')}
+                                         placeholder="Date Posted"/>
+                            <FormText className="text-secondary">
+                                You can set a future date to schedule a job posting. Posting a date in the future is a
+                                good
+                                way to preview the posting before making it live.
+                            </FormText>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3} html={validThruId}>Valid Through</Form.Label>
+                        <Col sm={9}>
+                            <FormControl type="date" size="sm" id={validThruId}
+                                         value={dayjs(posting.validThrough).isValid() ? dayjs(posting.validThrough).format('YYYY-MM-DD') : ''}
+                                         onChange={changeHandler('validThrough')}
+                                         min={dayjs(posting.datePosted).isValid() ? dayjs(posting.datePosted).format('YYYY-MM-DD') : ''}
+                                         placeholder="Valid Through"/>
+                            <FormText className="text-secondary">
+                                You can turn off a posting be setting it's '<strong>valid through</strong>' date to a
+                                date
+                                in the past. Once the '<strong>valid through</strong>' date is passed, the posting will
+                                no longer be shown on the websites.
+                            </FormText>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3} htmlFor={filenameId}>Job Description PDF</Form.Label>
+                        <Col xs={9}>
+                            {!!posting.filename && (
+                                <div className="row g-3">
+                                    <div className="col">
+                                        <a href={`https://intranet.chums.com/pdf/jobs/${posting.filename}`}
+                                           target="_blank">Download</a>
+                                    </div>
+                                    <div className="col-auto">
+                                        <Button type="button" size="sm" variant="primary" onClick={clearFilename}>
+                                            Upload new file
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="col-auto">
-                                    <button type="button" className="btn btn-sm btn-outline-secondary"
-                                            onClick={clearFilename}>
-                                        Upload new file
-                                    </button>
-                                </div>
-                            </div>
 
-                        )}
-                        {!posting.filename && <JobPostingPDFSelector/>}
-                    </FormColumn>
-                    <FormColumn label="Job Description">
-                        <GUIEditor2 value={posting.description} onChange={guiChangeHandler}
-                                    onChangeTimer={30000}/>
-                        <small className="text-muted">
-                            When pasting from Word, you must replace the bullet dots with the list dots in the above
-                            toolbar.
-                            When copying from PDF, you must also remove any unwanted line breaks.
-                        </small>
-                    </FormColumn>
-                    <FormColumn label="Job Location">
-                        <Select value={posting.jobLocation}
-                                onChange={selectChangeHandler('jobLocation')}
-                                className="form-select form-select-sm">
-                            <option value="">Select a Location</option>
-                            <option value="slc">Salt Lake City, UT</option>
-                            <option value="ketchum">Ketchum, ID</option>
-                            <option value="hurricane">Hurricane, UT</option>
-                            <option value="telecommute">Telecommute</option>
-                        </Select>
-                        {posting.jobLocation === 'telecommute' && (
+                            )}
+                            {!posting.filename && <JobPostingPDFSelector/>}
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3}>Job Description</Form.Label>
+                        <Col sm={9}>
+                            <GUIEditor2 value={posting.description} onChange={guiChangeHandler}
+                                        onChangeTimer={30000}/>
+                            <FormText className="text-secondary">
+                                When pasting from Word, you must replace the bullet dots with the list dots in the above
+                                toolbar.
+                                When copying from PDF, you must also remove any unwanted line breaks.
+                            </FormText>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3}>Job Location</Form.Label>
+                        <Col sm={9}>
+                            <FormSelect value={posting.jobLocation} onChange={selectChangeHandler('jobLocation')}
+                                        size="sm">
+                                <option value="">Select a Location</option>
+                                <option value="slc">Salt Lake City, UT</option>
+                                <option value="ketchum">Ketchum, ID</option>
+                                <option value="hurricane">Hurricane, UT</option>
+                                <option value="telecommute">Telecommute</option>
+                            </FormSelect>
+                            {posting.jobLocation === 'telecommute' && (
+                                <FormText className="text-secondary">
+                                    Jobs marked as TELECOMMUTE must be fully remote. Don't mark up jobs that allow
+                                    occasional work-from-home, jobs for which remote work is a negotiable benefit, or
+                                    have other arrangements that are not 100% remote. The "gig economy" nature of a job
+                                    doesn't imply that it is or is not remote.
+                                    <strong>The job description must clearly state that the job is 100% remote.</strong>
+                                </FormText>
+                            )}
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3}>Employment Type</Form.Label>
+                        <Col sm={9}>
+                            <FormSelect value={posting.employmentType || ''}
+                                        onChange={selectChangeHandler('employmentType')}
+                                        size="sm">
+                                <option value="">Select One</option>
+                                {Object.keys(EmploymentTypes).map((key) => (
+                                    <option key={key} value={key}>{EmploymentTypes[key as ValidEmploymentType]}</option>
+                                ))}
+                            </FormSelect>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3} htmlFor="jp--education-requirements">
+                            Education Requirements
+                        </Form.Label>
+                        <Col sm={9}>
+                            <FormControl id="jp--education-requirements" size="sm"
+                                         value={posting.educationalRequirements}
+                                         onChange={changeHandler('educationalRequirements')}
+                                         list="jp--education-requirements-list" maxLength={90}/>
+                            <datalist id="jp--education-requirements-list">
+                                <option>no requirements</option>
+                                <option>high school</option>
+                                <option>associate degree</option>
+                                <option>bachelor degree</option>
+                                <option>professional certificate</option>
+                                <option>postgraduate degree</option>
+                            </datalist>
                             <small className="text-muted">
-                                Jobs marked as TELECOMMUTE must be fully remote. Don't mark up jobs that allow
-                                occasional work-from-home, jobs for which remote work is a negotiable benefit, or
-                                have other arrangements that are not 100% remote. The "gig economy" nature of a job
-                                doesn't imply that it is or is not remote.
-                                <strong>The job description must clearly state that the job is 100% remote.</strong>
+                                These are the preferred values for Google; will appear friendlier on the page.
                             </small>
-                        )}
-                    </FormColumn>
-                    <FormColumn label="Employment Type">
-                        <Select value={posting.employmentType || ''}
-                                onChange={selectChangeHandler('employmentType')}
-                                className="form-select form-select-sm">
-                            <option value="">Select One</option>
-                            {Object.keys(EmploymentTypes).map((key) => (
-                                <option key={key} value={key}>{EmploymentTypes[key as ValidEmploymentType]}</option>
-                            ))}
-                        </Select>
-                    </FormColumn>
-                    <FormColumn label="Education Requirements">
-                        <Input id="jp--education-requirements" value={posting.educationalRequirements}
-                               onChange={changeHandler('educationalRequirements')}
-                               list="jp--education-requirements-list" maxLength={90}/>
-                        <datalist id="jp--education-requirements-list">
-                            <option>no requirements</option>
-                            <option>high school</option>
-                            <option>associate degree</option>
-                            <option>bachelor degree</option>
-                            <option>professional certificate</option>
-                            <option>postgraduate degree</option>
-                        </datalist>
-                        <small className="text-muted">
-                            These are the preferred values for Google; will appear friendlier on the page.
-                        </small>
-                    </FormColumn>
-                    <FormColumn label="Experience Requirements">
-                        <div className="row g-3">
-                            <div className="col-auto">
-                                <div className="input-group input-group-sm">
-                                    <Input type="number" min="0" value={posting.experienceRequirements ?? '0'}
-                                           onChange={changeHandler('experienceRequirements')}/>
-                                    <span className="input-group-text">Months</span>
-                                </div>
-                            </div>
-                            <div className="col-auto">
-                                <FormCheck label="Allow Experience in place of Education"
-                                           checked={posting.experienceInPlaceOfEducation} inline
-                                           type="checkbox"
-                                           onChange={changeHandler('experienceInPlaceOfEducation')}/>
-                            </div>
-                        </div>
-                    </FormColumn>
-                    <FormColumn label="Application Instructions">
-                        <TextArea value={posting.applicationInstructions || ''}
-                                  onChange={changeHandler('applicationInstructions')}/>
-                    </FormColumn>
-                    <FormColumn label="Email Recipient">
-                        <div className="row g-3">
-                            <div className="input-group input-group-sm">
-                                <span className="input-group-text">@</span>
-                                <Input type="email" value={posting.emailRecipient || ''}
-                                       placeholder="jobs@chums.com"
-                                       onChange={changeHandler('emailRecipient')}/>
-                            </div>
-                            <small>Defaults to jobs@chums.com; enter a different address to override.</small>
-                        </div>
-                    </FormColumn>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3}>Exp. Requirements</Form.Label>
+                        <Col sm={9}>
+                            <InputGroup size="sm">
+                                <FormControl type="number" size="sm"
+                                             value={posting.experienceRequirements ?? '0'}
+                                             onChange={changeHandler('experienceRequirements')}/>
+                                <InputGroup.Text>Months</InputGroup.Text>
+                            </InputGroup>
+                            <FormCheck label="Allow Experience in place of Education"
+                                       checked={posting.experienceInPlaceOfEducation}
+                                       type="checkbox"
+                                       onChange={changeHandler('experienceInPlaceOfEducation')}/>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm={3}>Application Instructions</Form.Label>
+                        <Col sm={9}>
+                            <FormControl as="textarea" value={posting.applicationInstructions || ''}
+                                         onChange={changeHandler('applicationInstructions')}/>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="mb-3" label="Email Recipient">
+                        <Form.Label column sm={3}>Email Recipient</Form.Label>
+                        <Col sm={9}>
+                            <InputGroup size="sm">
+                                <InputGroup.Text className="input-group-text">@</InputGroup.Text>
+                                <FormControl type="email" size="sm"
+                                             value={posting.emailRecipient || ''}
+                                             placeholder="jobs@chums.com"
+                                             onChange={changeHandler('emailRecipient')}/>
+                            </InputGroup>
+                            <Form.Text className="text-secondary">Defaults to jobs@chums.com; enter a different address
+                                to override.</Form.Text>
+                        </Col>
+                    </Form.Group>
 
                 </div>
-                <div className="mt-3">
-                    <button type="submit" className="btn btn-primary me-3">Save</button>
-                    <button type="button" className="btn btn-outline-secondary me-3" onClick={onNewPosting}>
-                        New Posting
-                    </button>
-                    <button type="button" className="btn btn-outline-danger me-3" onClick={onDeletePosting}
+                <Stack direction="horizontal" gap={3} className="mt-3 justify-content-end">
+                    <Button type="button" size="sm" variant="outline-danger" onClick={onDeletePosting}
                             disabled={posting.id === 0}>
                         Delete Posting
-                    </button>
-                </div>
-            </form>
+                    </Button>
+                    <Button type="button" size="sm" variant="outline-secondary" onClick={onNewPosting}>
+                        New Posting
+                    </Button>
+                    <Button type="submit" variant="primary" size="sm">Save</Button>
+                </Stack>
+            </Form>
         </ErrorBoundary>
     )
 }

@@ -1,6 +1,6 @@
-import React, {memo, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {selectCurrentPosting} from "./index";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import classNames from "classnames";
 import {loadJobPosting} from "./actions";
 import {JobPosting} from "../../types";
@@ -11,7 +11,7 @@ interface JobPostingRowProps {
     posting: JobPosting;
 }
 
-const isValidDatePosted = (posting:JobPosting):boolean => {
+const isValidDatePosted = (posting: JobPosting): boolean => {
     if (!posting || !posting.datePosted) {
         return false;
     }
@@ -22,8 +22,8 @@ const isValidDatePosted = (posting:JobPosting):boolean => {
         && (!posting.validThrough || (validThrough.isValid() && validThrough.endOf('day').isAfter(now)));
 }
 
-const isFuture = (posting:JobPosting):boolean => {
-    if (!posting|| !posting.datePosted) {
+const isFuture = (posting: JobPosting): boolean => {
+    if (!posting || !posting.datePosted) {
         return false;
     }
     const datePosted = dayjs(posting.datePosted);

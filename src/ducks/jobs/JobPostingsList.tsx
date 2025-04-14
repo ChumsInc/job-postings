@@ -1,45 +1,33 @@
-import React, {ChangeEvent, useEffect, useId} from "react";
+import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
-import {selectJobPostings, selectShowInactive} from "./index";
-import {loadJobPosting, loadJobPostings, toggleShowInactive} from './actions';
+import {selectJobPostings} from "./index";
+import {loadJobPostings} from './actions';
 import JobPostingRow from "./JobPostingRow";
 import {ErrorBoundary} from "react-error-boundary";
 import {useAppDispatch} from "../../app/configureStore";
 import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
-import {FormCheck} from "chums-components";
+import JobPostingsFilter from "./JobPostingsFilter";
+import {TablePagination} from "@chumsinc/sortable-tables";
 
 const JobPostingsList: React.FC = () => {
     const dispatch = useAppDispatch();
     const list = useSelector(selectJobPostings);
-    const showInactive = useSelector(selectShowInactive);
-    const id = useId();
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
-    const setActive = (ev: ChangeEvent<HTMLInputElement>) => dispatch(toggleShowInactive(ev.target.checked))
-    const onReload = () => dispatch(loadJobPostings());
-    const onClickNew = () => dispatch(loadJobPosting(0));
 
     useEffect(() => {
         dispatch(loadJobPostings());
-    }, [])
+    }, []);
+
+    const rppChangeHandler = (rpp: number) => {
+        setPage(0);
+        setPage(rpp);
+    }
 
     return (
         <div className="">
-            <div className="row g-3">
-                <div className="col-auto">
-                    <label htmlFor={id}>Show Inactive</label>
-                </div>
-                <div className="col-auto">
-                    <div className="form-check-inline">
-                        <FormCheck type="checkbox" checked={showInactive} onChange={setActive} id={id} label="" />
-                    </div>
-                </div>
-                <div className="col-auto">
-                    <button type="button" className="btn btn-primary btn-sm" onClick={onReload}>Reload</button>
-                </div>
-                <div className="col-auto">
-                    <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClickNew}>New</button>
-                </div>
-            </div>
+            <JobPostingsFilter/>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
                 <table className="table table-hover table-sm">
                     <thead>
@@ -51,7 +39,9 @@ const JobPostingsList: React.FC = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {list.map(posting => <JobPostingRow key={posting.id} posting={posting}/>)}
+                    {list
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map(posting => <JobPostingRow key={posting.id} posting={posting}/>)}
                     </tbody>
                     <tfoot>
                     <tr>
@@ -60,6 +50,10 @@ const JobPostingsList: React.FC = () => {
                     </tr>
                     </tfoot>
                 </table>
+                <TablePagination page={page} onChangePage={setPage} size="sm"
+                                 rowsPerPage={rowsPerPage} rowsPerPageProps={{onChange: rppChangeHandler}}
+                                 count={list.length} showFirst showLast
+                />
             </ErrorBoundary>
         </div>
     )

@@ -5,7 +5,7 @@ import JobDate from "./JobDate";
 import EducationalRequirements from "./EducationalRequirements";
 import {ErrorBoundary} from "react-error-boundary";
 import './job-openings.css'
-import {Alert} from "chums-components";
+import Alert from "react-bootstrap/Alert";
 import {EmploymentTypes} from "../ducks/jobs/utils";
 import ErrorBoundaryFallbackAlert from "../app/ErrorBoundaryFallbackAlert";
 
@@ -96,7 +96,7 @@ const JobPostingRender: React.FC<JobPostingProps> = ({posting}) => {
                 <section>
                     <h3>How to Apply</h3>
                     {!filename && (
-                        <Alert title="Uh oh!" color="warning">The job description has not been uploaded.</Alert>
+                        <Alert title="Uh oh!" variant="warning">The job description has not been uploaded.</Alert>
                     )}
                     <ul>
                         {!!filename && (

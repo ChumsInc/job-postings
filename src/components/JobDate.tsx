@@ -1,14 +1,15 @@
 import React from 'react';
-import {Alert} from "chums-components";
+import Alert from "react-bootstrap/Alert";
 
 interface JobDateProps {
     date: string|Date|null,
     schemaTag: 'datePosted'|'validThrough'|'jobStartDate',
 }
-const JobDate:React.FC<JobDateProps> = ({date, schemaTag}) => {
+
+const JobDate = ({date, schemaTag}:JobDateProps) => {
     if (!date || !new Date(date).getTime()) {
         return (
-            <Alert color="warning" title="Warning">Invalid date for field '{schemaTag}'</Alert>
+            <Alert variant="warning" title="Warning">Invalid date for field '{schemaTag}'</Alert>
         )
     }
     return (
