@@ -9,7 +9,7 @@ import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
 import JobPostingsFilter from "./JobPostingsFilter";
 import {TablePagination} from "@chumsinc/sortable-tables";
 
-const JobPostingsList: React.FC = () => {
+const JobPostingsList = () => {
     const dispatch = useAppDispatch();
     const list = useSelector(selectJobPostings);
     const [page, setPage] = useState(0);
@@ -22,7 +22,7 @@ const JobPostingsList: React.FC = () => {
 
     const rppChangeHandler = (rpp: number) => {
         setPage(0);
-        setPage(rpp);
+        setRowsPerPage(rpp);
     }
 
     return (

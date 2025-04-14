@@ -96,6 +96,7 @@ const GUIEditor2 = ({value, options = {}, onChange, onChangeTimer = 1000}:GUIMce
     if (!apiKey) {
         return null;
     }
+
     return (
         <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
             <Editor
