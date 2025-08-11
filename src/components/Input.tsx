@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 interface InputProps extends React.InputHTMLAttributes<any> {
     onChange: (any: any) => void,

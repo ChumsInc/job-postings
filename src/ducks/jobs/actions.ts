@@ -1,8 +1,8 @@
 import {selectCurrentStatus, selectLoading} from "./index";
-import {JobPosting} from "../../types";
+import type {JobPosting} from "../../types";
 import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
-import {RootState} from "../../app/configureStore";
-import {deleteJobPosting, fetchJobPosting, fetchJobPostings, postJobPDF, PostJobPDFArgs, postJobPosting} from "./api";
+import type {RootState} from "@/app/configureStore";
+import {deleteJobPosting, fetchJobPosting, fetchJobPostings, postJobPDF, type PostJobPDFArgs, postJobPosting} from "./api";
 
 
 export const updateJobPosting = createAction<Partial<JobPosting>>('jobs/current/update');
@@ -14,7 +14,7 @@ export const loadJobPostings = createAsyncThunk<JobPosting[]>(
         return await fetchJobPostings();
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return !selectLoading(state);
         }
@@ -27,7 +27,7 @@ export const loadJobPosting = createAsyncThunk<JobPosting | null, number>(
         return await fetchJobPosting(arg);
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return selectCurrentStatus(state) === 'idle';
         }
@@ -54,7 +54,7 @@ export const saveJobPosting = createAsyncThunk<JobPosting | null, JobPosting>(
         return await postJobPosting(arg);
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return selectCurrentStatus(state) === 'idle';
         }

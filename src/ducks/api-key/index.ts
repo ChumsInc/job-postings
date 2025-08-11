@@ -1,6 +1,6 @@
 import {fetchJSON} from "@chumsinc/ui-utils";
 import {createAsyncThunk, createReducer} from "@reduxjs/toolkit";
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 
 export interface ApiKeyState {
     tinyMCE: string | null;
@@ -34,7 +34,7 @@ export const loadTinyMCEKey = createAsyncThunk<string | null>(
         return await fetchTinyMCEAPIKey();
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return !selectKeysLoading(state);
         }

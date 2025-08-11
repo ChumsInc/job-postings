@@ -1,4 +1,3 @@
-import React from "react";
 import {useSelector} from "react-redux";
 import {selectCurrentPosting} from "./index";
 import JobPostingRender from "../../components/JobPostingRender";
@@ -7,7 +6,7 @@ import CopyButton from "../../components/CopyButton";
 import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
 
 
-const JobPostingPreview: React.FC = () => {
+export default function JobPostingPreview() {
     const selected = useSelector(selectCurrentPosting);
     const linkUrl = `https://intranet.chums.com/apps/current-openings/?id=${selected.id}`;
     const previewUrl = `${linkUrl}&preview=1`;
@@ -44,5 +43,3 @@ const JobPostingPreview: React.FC = () => {
         </ErrorBoundary>
     )
 }
-
-export default JobPostingPreview;

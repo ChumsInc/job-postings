@@ -1,4 +1,3 @@
-import React from 'react';
 import JobPostingsList from "../ducks/jobs/JobPostingsList";
 import JobPostingEditor from "../ducks/jobs/JobPostingEditor";
 import JobPostingPreview from "../ducks/jobs/JobPostingPreview";

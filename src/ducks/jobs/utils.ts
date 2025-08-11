@@ -1,4 +1,4 @@
-import {EmploymentTypeMap, JobPosting} from "../../types";
+import type {EmploymentTypeMap, JobPosting} from "../../types";
 
 export const defaultJobPosting: JobPosting = {
     id: 0,

@@ -1,5 +1,5 @@
 import React from "react";
-import {JobPosting} from "../../types";
+import type {JobPosting} from "../../types";
 import {ErrorBoundary} from "react-error-boundary";
 import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
 

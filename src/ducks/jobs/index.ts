@@ -1,8 +1,8 @@
-import {RootState} from "../../app/configureStore";
-import {JobPosting} from "../../types";
+import type {RootState} from "@/app/configureStore";
+import type {JobPosting} from "../../types";
 import {createReducer, createSelector} from "@reduxjs/toolkit";
 import dayjs from "dayjs";
-import {Editable, SortProps} from "chums-types";
+import type {Editable, SortProps} from "chums-types";
 import {
     loadJobPosting,
     loadJobPostings,
@@ -89,7 +89,7 @@ const jobsReducer = createReducer(initialJobsState, (builder) => {
                 state.current.entry = entry ?? {...defaultJobPosting};
             }
         })
-        .addCase(loadJobPostings.rejected, (state, action) => {
+        .addCase(loadJobPostings.rejected, (state) => {
             state.list.loading = false;
         })
         .addCase(loadJobPosting.pending, (state, action) => {
@@ -113,7 +113,7 @@ const jobsReducer = createReducer(initialJobsState, (builder) => {
         .addCase(uploadJobPDF.pending, (state) => {
             state.current.status = 'uploading';
         })
-        .addCase(uploadJobPDF.fulfilled, (state, action) => {
+        .addCase(uploadJobPDF.fulfilled, (state) => {
             state.current.status = 'idle';
         })
         .addCase(uploadJobPDF.rejected, (state) => {

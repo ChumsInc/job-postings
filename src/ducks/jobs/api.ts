@@ -1,10 +1,10 @@
-import {JobPosting} from "../../types";
+import type {JobPosting} from "../../types";
 import {fetchJSON} from "@chumsinc/ui-utils";
 
 
 export async function fetchJobPostings(): Promise<JobPosting[]> {
     try {
-        const url = '/api/timeclock-admin/job-postings.json';
+        const url = '/api/payroll/timeclock-admin/job-postings.json';
         const response = await fetchJSON<{ postings: JobPosting[] }>(url, {cache: 'no-cache'});
         return response?.postings ?? [];
     } catch (err: unknown) {
@@ -22,7 +22,7 @@ export async function fetchJobPosting(id: number): Promise<JobPosting | null> {
         if (!id) {
             return null;
         }
-        const url = '/api/timeclock-admin/job-postings/:id.json'
+        const url = '/api/payroll/timeclock-admin/job-postings/:id.json'
             .replace(':id', encodeURIComponent(id));
         const response = await fetchJSON<{ postings: JobPosting[] }>(url, {cache: 'no-cache'});
         if (!response?.postings || !response.postings.length) {
@@ -42,8 +42,8 @@ export async function fetchJobPosting(id: number): Promise<JobPosting | null> {
 export async function postJobPosting(arg: JobPosting): Promise<JobPosting | null> {
     try {
         const url = arg.id === 0
-            ? '/api/timeclock-admin/job-postings.json'
-            : '/api/timeclock-admin/job-postings/:id.json'.replace(':id', encodeURIComponent(arg.id));
+            ? '/api/payroll/timeclock-admin/job-postings.json'
+            : '/api/payroll/timeclock-admin/job-postings/:id.json'.replace(':id', encodeURIComponent(arg.id));
         const method = arg.id === 0 ? 'post' : 'put';
         const response = await fetchJSON<{ postings: JobPosting[] }>(url, {method, body: JSON.stringify(arg)});
         if (!response?.postings || !response.postings.length) {
@@ -62,7 +62,7 @@ export async function postJobPosting(arg: JobPosting): Promise<JobPosting | null
 
 export async function deleteJobPosting(arg: number): Promise<JobPosting[]> {
     try {
-        const url = '/api/timeclock-admin/job-postings/:id.json'.replace(':id', encodeURIComponent(arg));
+        const url = '/api/payroll/timeclock-admin/job-postings/:id.json'.replace(':id', encodeURIComponent(arg));
         const response = await fetchJSON<{ postings: JobPosting[] }>(url, {method: 'delete'});
         return response?.postings ?? [];
     } catch (err: unknown) {
@@ -112,7 +112,7 @@ export async function postJobPDF(arg: PostJobPDFArgs): Promise<boolean> {
                 return resolve(true);
             });
 
-            xhr.onreadystatechange = (ev) => {
+            xhr.onreadystatechange = () => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const {postings, error} = xhr.response;
                     if (postings) {
@@ -128,7 +128,7 @@ export async function postJobPDF(arg: PostJobPDFArgs): Promise<boolean> {
 
             const formData = new FormData();
             formData.append(file.name, file, file.name);
-            const url = '/api/timeclock-admin/job-postings/:id/upload-pdf.json'
+            const url = '/api/payroll/timeclock-admin/job-postings/:id/upload-pdf.json'
                 .replace(':id', encodeURIComponent(id))
             xhr.open('POST', url, true);
             xhr.send(formData);

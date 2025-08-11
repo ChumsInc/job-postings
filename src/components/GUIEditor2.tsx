@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {ErrorBoundary} from "react-error-boundary";
-import {Editor, IAllProps} from '@tinymce/tinymce-react';
+import {Editor, type IAllProps} from '@tinymce/tinymce-react';
 import ErrorBoundaryFallbackAlert from "../app/ErrorBoundaryFallbackAlert";
 import {useSelector} from "react-redux";
-import {loadTinyMCEKey, selectTinyMCEKey} from "../ducks/api-key";
+import {loadTinyMCEKey, selectTinyMCEKey} from "@/ducks/api-key/index";
 import {useAppDispatch} from "../app/configureStore";
 
 const defaultEditorOptions: IAllProps['init'] = {

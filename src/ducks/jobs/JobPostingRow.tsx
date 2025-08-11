@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {selectCurrentPosting} from "./index";
 import {useSelector} from "react-redux";
 import classNames from "classnames";
 import {loadJobPosting} from "./actions";
-import {JobPosting} from "../../types";
-import {useAppDispatch} from "../../app/configureStore";
+import type {JobPosting} from "../../types";
+import {useAppDispatch} from "@/app/configureStore";
 import dayjs from "dayjs";
 
 interface JobPostingRowProps {

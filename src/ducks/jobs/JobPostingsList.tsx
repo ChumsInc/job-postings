@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {selectJobPostings} from "./index";
 import {loadJobPostings} from './actions';
 import JobPostingRow from "./JobPostingRow";
 import {ErrorBoundary} from "react-error-boundary";
-import {useAppDispatch} from "../../app/configureStore";
-import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
+import {useAppDispatch} from "@/app/configureStore";
+import ErrorBoundaryFallbackAlert from "@/app/ErrorBoundaryFallbackAlert";
 import JobPostingsFilter from "./JobPostingsFilter";
 import {TablePagination} from "@chumsinc/sortable-tables";
 

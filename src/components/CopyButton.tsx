@@ -6,15 +6,15 @@ interface CopyButtonProps extends React.ButtonHTMLAttributes<any> {
     copiedText?: string,
 }
 
-const CopyButton: React.FC<CopyButtonProps> = ({
-                                                   copy,
-                                                   text,
-                                                   copiedText,
-                                                   className,
-                                                   onClick,
-                                                   children,
-                                                   ...props
-                                               }) => {
+const CopyButton = ({
+                        copy,
+                        text,
+                        copiedText,
+                        className,
+                        onClick,
+                        children,
+                        ...props
+                    }: CopyButtonProps) => {
     if (!className) {
         className = 'btn btn-sm btn-outline-primary';
     }

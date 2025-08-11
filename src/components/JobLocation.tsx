@@ -1,6 +1,3 @@
-import React from "react";
-
-
 interface JobLocationType {
     streetAddress: string,
     addressLocality: string,
@@ -35,35 +32,12 @@ const Ketchum: JobLocationType = {
 
 export const jobLocationLD = (name: string): JobLocationType => {
     switch (name) {
-    case 'hurricane':
-        return Hurricane;
-    case 'ketchum':
-        return Ketchum;
-    case 'slc':
-    default:
-        return SLC;
+        case 'hurricane':
+            return Hurricane;
+        case 'ketchum':
+            return Ketchum;
+        case 'slc':
+        default:
+            return SLC;
     }
 }
-
-interface JobLocationProps {
-    location: string,
-}
-
-const JobLocation: React.FC<JobLocationProps> = ({location}) => {
-    const {streetAddress, addressLocality, addressRegion, postalCode} = jobLocationLD(location);
-    return (
-        <div property="jobLocation" typeof="Place">
-            <address property="address" typeof="PostalAddress">
-                <div property="streetAddress">{streetAddress}</div>
-                <div>
-                    <span property="addressLocality">{addressLocality}</span>,
-                    {' '}
-                    <span property="addressRegion">{addressRegion}</span>
-                    {' '}
-                    <span property="postalCode">{postalCode}</span>
-                </div>
-            </address>
-        </div>
-    )
-}
-export default JobLocation;

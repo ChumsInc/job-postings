@@ -1,6 +1,6 @@
-import {BasicAlert} from '@chumsinc/ui-utils';
-import {createAction, createReducer, SerializedError, isRejected} from "@reduxjs/toolkit";
-import {RootState} from "../../app/configureStore";
+import type {BasicAlert} from '@chumsinc/ui-utils';
+import {createAction, createReducer, type SerializedError, isRejected} from "@reduxjs/toolkit";
+import type {RootState} from "@/app/configureStore";
 
 export interface ExtendedAlert extends BasicAlert {
     count: number;

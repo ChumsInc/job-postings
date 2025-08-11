@@ -1,8 +1,8 @@
-import React, {ChangeEvent, useRef, useState} from "react";
+import {type ChangeEvent, useRef, useState} from "react";
 import {useSelector} from "react-redux";
 import {selectCurrentPosting, selectCurrentStatus} from "./index";
 import {uploadJobPDF} from "./actions";
-import {useAppDispatch} from "../../app/configureStore";
+import {useAppDispatch} from "@/app/configureStore";
 
 const JobPostingPDFSelector = () => {
     const dispatch = useAppDispatch();

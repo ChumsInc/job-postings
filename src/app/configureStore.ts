@@ -2,7 +2,7 @@ import {configureStore} from '@reduxjs/toolkit'
 import {combineReducers} from "redux";
 import alertsReducer from "../ducks/alerts";
 import jobsReducer from "../ducks/jobs";
-import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
+import {type TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import apiKeysReducer from "../ducks/api-key";
 
 const rootReducer = combineReducers({

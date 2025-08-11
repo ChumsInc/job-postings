@@ -1,5 +1,5 @@
-import React, {ChangeEvent, useId} from 'react';
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {type ChangeEvent, useId} from 'react';
+import {useAppDispatch, useAppSelector} from "@/app/configureStore";
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import FormCheck from "react-bootstrap/FormCheck";

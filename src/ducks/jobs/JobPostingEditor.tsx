@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useId} from "react";
+import React, {type ChangeEvent, useId} from "react";
 import {useSelector} from "react-redux";
 import {selectCurrentPosting} from "./index";
 import {loadJobPosting, removeJobPosting, saveJobPosting, updateJobPosting,} from "./actions";
@@ -7,8 +7,8 @@ import {ErrorBoundary} from "react-error-boundary";
 import GUIEditor2 from "../../components/GUIEditor2";
 import JobPostingPDFSelector from "./JobPostingPDFSelector";
 import ErrorBoundaryFallbackAlert from "../../app/ErrorBoundaryFallbackAlert";
-import {useAppDispatch} from "../../app/configureStore";
-import {JobPosting, ValidEmploymentType} from "../../types";
+import {useAppDispatch} from "@/app/configureStore";
+import {type JobPosting, type ValidEmploymentType} from "../../types";
 import dayjs from "dayjs";
 import {EmploymentTypes} from "./utils";
 import {Badge, Form, FormControl, FormSelect, FormText, InputGroup, Stack} from "react-bootstrap";
@@ -34,7 +34,7 @@ const JobPostingIcon = ({id, changed, datePosted, validThrough}: JobPostingIconP
         'text-info': datePosted && new Date(datePosted) > now && (!validThrough || new Date(validThrough) > now),
     }
     return (
-        <Badge bg={changed ? 'warning' : 'light'} className="ms-3"><span className={classNames(className)}/></Badge>
+        <Badge bg={changed ? 'warning' : undefined} className="ms-3"><span className={classNames(className)}/></Badge>
     )
 }
 const JobPostingEditor = () => {
@@ -108,7 +108,7 @@ const JobPostingEditor = () => {
     return (
         <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
             <Form onSubmit={onSubmit}>
-                <div className="row g-3 sticky-top align-items-center mb-3 bg-light">
+                <div className="row g-3 sticky-top align-items-center mb-3">
                     <h3 className="col">
                         {posting.title || 'Position Title'}
                         <JobPostingIcon id={posting.id} changed={posting.changed}

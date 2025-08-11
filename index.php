@@ -18,5 +18,5 @@ $ui = new WebUI2([
     'requiredRoles' => [Groups::TIMECLOCK_SUPERVISOR, Groups::HR],
     'bodyClassName' => 'container-fluid',
 ]);
-$ui->addManifestJSON('./public/js/manifest.json')
+$ui->addViteManifest()
     ->render();
