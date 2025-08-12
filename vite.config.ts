@@ -17,7 +17,7 @@ export default defineConfig({
             "@/types": path.resolve(process.cwd(), 'src/types'),
         }
     },
-    base: "/apps/amz-fba-item-map/",
+    base: "/apps/job-postings/",
     build: {
         manifest: true,
         sourcemap: true,
